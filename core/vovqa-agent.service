@@ -1,0 +1,15 @@
+[Unit]
+Description=Vovqa Backup Agent
+After=network.target
+
+[Service]
+Type=simple
+User=vovqa
+ExecStart=/usr/local/bin/vovqa-core /etc/vovqa/agent.json
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

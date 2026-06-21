@@ -1,0 +1,69 @@
+.TH obs-agent 1 "2026-06-21" "OBS Backup 1.0.0"
+.SH NAME
+obs-agent \- агент системы резервного копирования OBS Backup
+.SH SYNOPSIS
+.B obs-agent
+[\fICOMMAND\fR] [\fIOPTIONS\fR]
+.br
+.B obs-agent --server \fIURL\fR --token \fITOKEN\fR
+.SH DESCRIPTION
+.B obs-agent
+\(:- кроссплатформенный агент для системы резервного копирования OBS Backup.
+Выполняет бэкапы по заданиям от сервера, поддерживает CBT, CDP,
+дедупликацию, сжатие и шифрование.
+.SH COMMANDS
+.TP
+.B start
+Запустить агент (по умолчанию)
+.TP
+.B stop
+Остановить агент
+.TP
+.B restart
+Перезапустить агент
+.TP
+.B status
+Показать статус агента
+.TP
+.B diag
+Полная диагностика
+.TP
+.B version
+Показать версию
+.TP
+.B upgrade
+Проверить и установить обновление
+.TP
+.B clear-cache
+Очистить кэш чанков
+.SH OPTIONS
+.TP
+.B --server \fIURL\fR
+URL сервера OBS Backup
+.TP
+.B --token \fITOKEN\fR
+Токен для регистрации агента
+.TP
+.B --log-level \fILEVEL\fR
+Уровень логирования: debug, info, warn, error
+.TP
+.B --help
+Показать справку
+.SH FILES
+.TP
+.I /etc/obs-agent/config.json
+Конфигурация агента
+.TP
+.I /var/log/obs-agent/agent.log
+Лог-файл агента
+.TP
+.I /var/cache/obs-agent/
+Кэш чанков
+.SH EXAMPLES
+.B obs-agent --status
+.br
+.B obs-agent --diag
+.br
+.B obs-agent --upgrade
+.SH SEE ALSO
+.BR obs-agent-config (5)

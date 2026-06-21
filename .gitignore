@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+.env
+venv/
+node_modules/
+dist/
+*.egg-info/
+.pytest_cache/
+.celerybeat-schedule
+core/build/
+core/output/
+frontend/dist/
+*.o
+*.a
+*.exe
+*.so

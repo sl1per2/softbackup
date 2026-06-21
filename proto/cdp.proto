@@ -1,0 +1,43 @@
+syntax = "proto3";
+package obs;
+
+message CdpStartRequest {
+  string policy_id = 1;
+  string agent_id = 2;
+  string source_path = 3;
+  int32 interval_seconds = 4;
+  int32 max_latency_ms = 5;
+  int32 retention_minutes = 6;
+}
+
+message CdpStopRequest {
+  string session_id = 1;
+}
+
+message CdpStatus {
+  string session_id = 1;
+  enum Status { ACTIVE = 0; PAUSED = 1; STOPPED = 2; ERROR = 3; }
+  Status status = 2;
+  int64 lag_ms = 3;
+  double iops = 4;
+  double throughput_mbps = 5;
+  int64 blocks_tracked = 6;
+  string started_at = 7;
+  int64 current_lag_ms = 8;
+}
+
+message CdpBlockChange {
+  string session_id = 1;
+  uint64 lba = 2;
+  uint32 size = 3;
+  string timestamp = 4;
+}
+
+message CdpRecoveryPoint {
+  string id = 1;
+  string session_id = 2;
+  string timestamp = 3;
+  int64 block_count = 4;
+  uint64 size_bytes = 5;
+  bool is_consistent = 6;
+}

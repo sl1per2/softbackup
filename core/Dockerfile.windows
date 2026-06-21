@@ -1,0 +1,31 @@
+FROM ubuntu:22.04 AS builder
+
+ARG TARGET_ARCH=x86_64
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    build-essential cmake \
+    gcc-mingw-w64 g++-mingw-w64 \
+    mingw-w64-tools \
+    pkg-config \
+    wget unzip git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /deps
+
+# Build cross-compilation dependencies
+COPY core/cmake/build-deps.sh /deps/build-deps.sh
+RUN chmod +x /deps/build-deps.sh && /deps/build-deps.sh ${TARGET_ARCH}
+
+WORKDIR /src
+COPY core/ /src/core/
+COPY proto/ /src/proto/
+
+RUN mkdir -p build && cd build && \
+    cmake ../core \
+        -DCMAKE_TOOLCHAIN_FILE=../core/cmake/mingw-w64-${TARGET_ARCH}.cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_PREFIX_PATH=/deps/install/${TARGET_ARCH} \
+        -DCMAKE_FIND_ROOT_PATH="/usr/${TARGET_ARCH}-w64-mingw32;/deps/install/${TARGET_ARCH}" \
+        && make -j$(nproc)

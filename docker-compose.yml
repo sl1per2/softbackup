@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: obs_backup
+      POSTGRES_USER: obs
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - obs-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U obs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - obs-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - /tmp/obs-core.sock:/tmp/obs-core.sock
+      - ./backend/agents:/app/agents
+    networks:
+      - obs-network
+
+  celery-worker:
+    build: ./backend
+    command: celery -A app.services worker --loglevel=info --concurrency=4
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - obs-network
+
+  celery-beat:
+    build: ./backend
+    command: celery -A app.services beat --loglevel=info
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - obs-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - obs-network
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  obs-network:
+    driver: bridge

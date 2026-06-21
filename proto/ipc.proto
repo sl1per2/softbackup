@@ -1,0 +1,58 @@
+syntax = "proto3";
+package obs;
+
+import "backup.proto";
+import "cdp.proto";
+import "metrics.proto";
+import "traffic.proto";
+
+message IpcMessage {
+  oneof payload {
+    StartJobRequest start_job = 1;
+    StopJobRequest stop_job = 2;
+    GetStatusRequest get_status = 3;
+    GetMetricsRequest get_metrics = 4;
+    RestoreRequest restore = 5;
+    CdpStartRequest cdp_start = 6;
+    CdpStopRequest cdp_stop = 7;
+    CdpGetStatusRequest cdp_get_status = 8;
+    TrafficCommand get_traffic_stats = 9;
+  }
+}
+
+message StartJobRequest {
+  BackupJobConfig config = 1;
+}
+
+message StopJobRequest {
+  string job_id = 1;
+}
+
+message GetStatusRequest {
+  string job_id = 1;
+}
+
+message GetMetricsRequest {}
+
+message CdpGetStatusRequest {
+  string session_id = 1;
+}
+
+message IpcResponse {
+  oneof response {
+    JobStatusResponse status = 1;
+    MetricsResponse metrics = 2;
+    ErrorResponse error = 3;
+    CdpStatus cdp_status = 4;
+    TrafficStatsResponse traffic_stats = 5;
+  }
+}
+
+message JobStatusResponse {
+  BackupJobStatus status = 1;
+}
+
+message ErrorResponse {
+  int32 code = 1;
+  string message = 2;
+}

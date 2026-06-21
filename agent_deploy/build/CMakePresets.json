@@ -1,0 +1,27 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "linux-x64-release",
+            "displayName": "Linux x64 Release",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/../../core/build/linux-x64",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_STANDARD": "17"
+            }
+        },
+        {
+            "name": "linux-arm64-release",
+            "displayName": "Linux ARM64 Release",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/../../core/build/linux-arm64",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_STANDARD": "17",
+                "CMAKE_C_COMPILER": "aarch64-linux-gnu-gcc",
+                "CMAKE_CXX_COMPILER": "aarch64-linux-gnu-g++"
+            }
+        }
+    ]
+}

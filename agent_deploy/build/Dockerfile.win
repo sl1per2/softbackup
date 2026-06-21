@@ -1,0 +1,20 @@
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    cmake make git wget curl \
+    g++-mingw-w64-x86-64 g++-mingw-w64-i686 \
+    g++-aarch64-linux-gnu gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu \
+    libssl-dev libcurl4-openssl-dev \
+    protobuf-compiler libprotobuf-dev \
+    libsqlite3-dev libspdlog-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+COPY core/ /build/core/
+COPY proto/ /build/proto/
+COPY agent_deploy/build/build_win64.sh /build/build_win64.sh
+RUN chmod +x /build/build_win64.sh
+
+CMD ["/build/build_win64.sh"]

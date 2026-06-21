@@ -1,0 +1,14 @@
+{
+    "agent_id": "agent-001",
+    "server_url": "http://localhost:8000",
+    "auth_token": "",
+    "socket_path": "/tmp/obs-core.sock",
+    "data_dir": "/var/lib/obs",
+    "log_dir": "/var/log/obs",
+    "cache_dir": "/var/cache/obs",
+    "cache_max_size_gb": 100,
+    "default_chunk_size": 1048576,
+    "max_streams": 5,
+    "heartbeat_interval_s": 30,
+    "health_check_interval_s": 60
+}

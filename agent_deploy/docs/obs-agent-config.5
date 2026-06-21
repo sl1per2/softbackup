@@ -1,0 +1,36 @@
+.TH obs-agent-config 5 "2026-06-21" "OBS Backup 1.0.0"
+.SH NAME
+obs-agent-config \- конфигурационный файл агента OBS Backup
+.SH DESCRIPTION
+JSON-файл \fI/etc/obs-agent/config.json\fR.
+.SH PARAMETERS
+.TP
+.B server_url (string, mandatory)
+URL сервера OBS Backup
+.TP
+.B token (string, mandatory)
+Токен для регистрации агента
+.TP
+.B log_level (string, default: "info")
+debug, info, warn, error
+.TP
+.B cache_size_mb (int, default: 1024)
+Размер кэша чанков (MB)
+.TP
+.B max_concurrent_jobs (int, default: 2)
+Макс. одновременных заданий
+.TP
+.B bandwidth_limit_kbps (int, default: 0)
+Ограничение скорости (0 = без ограничений)
+.SH EXAMPLE
+.PP
+.RS 4
+{
+    "server_url": "https://backup.example.com",
+    "token": "eyJhbGciOiJIUzI1NiIs...",
+    "log_level": "info",
+    "cache_size_mb": 2048
+}
+.RE
+.SH SEE ALSO
+.BR obs-agent (1)
