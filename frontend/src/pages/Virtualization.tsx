@@ -84,7 +84,9 @@ export default function Virtualization() {
       setHypervisors(connResp.data);
       setBackupJobs(jobResp.data);
       setFeatures(featResp.data);
-    } catch {}
+    } catch {
+      message.error('Failed to load virtualization data');
+    }
     setLoading(false);
   };
 

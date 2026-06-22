@@ -8,7 +8,12 @@ export default function VMReplication() {
   const [reps, setReps] = useState<any[]>([]);
 
   const fetchData = async () => {
-    try { const r = await api.get('/api/replication-v2'); setReps(r.data.replications || []); } catch {}
+    try {
+      const r = await api.get('/api/replication-v2');
+      setReps(r.data.replications || []);
+    } catch {
+      message.error('Failed to load VM replication jobs');
+    }
   };
 
   useEffect(() => { fetchData(); }, []);

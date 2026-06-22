@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, Table, Button, Space, Tag, message } from 'antd';
 import { ThunderboltOutlined, PlayCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
@@ -7,13 +7,19 @@ import api from '../utils/api';
 export default function DisasterRecovery() {
   const [plans, setPlans] = useState<any[]>([]);
   const [runs, setRuns] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
       const [p, r] = await Promise.all([api.get('/api/dr/plans'), api.get('/api/dr/runs')]);
       setPlans(p.data.plans || []);
       setRuns(r.data.runs || []);
-    } catch {}
+    } catch {
+      message.error('Failed to load DR data');
+    }
+    setLoading(false);
+  }, []);
   };
 
   useEffect(() => { fetchData(); }, []);

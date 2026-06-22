@@ -106,4 +106,84 @@ bool PostgresAdapter::run_pg_basebackup(const BackupConfig& config, BackupProgre
     return system(cmd.c_str()) == 0;
 }
 
+bool PostgresAdapter::test_connection(const DbConnection& conn) {
+    std::string cmd = "pg_isready -h " + conn.host + " -p " + std::to_string(conn.port) +
+                     " -U " + conn.username;
+    spdlog::info("Testing PostgreSQL connection: {}", cmd);
+    return system(cmd.c_str()) == 0;
+}
+
+bool PostgresAdapter::backup(const BackupConfig& config, BackupProgressCallback callback) {
+    spdlog::info("PostgreSQL backup: type={}", config.backup_type);
+    if (config.backup_type == "wal") {
+        return setup_wal_archiving(config.connection, config.output_path);
+    }
+    if (config.backup_type == "incremental") {
+        return run_pg_basebackup(config, callback);
+    }
+    return run_pg_basebackup(config, callback);
+}
+
+bool PostgresAdapter::restore(const RestoreConfig& config, BackupProgressCallback callback) {
+    spdlog::info("PostgreSQL restore from {}", config.source_path);
+    std::string cmd = "pg_restore -h " + config.target.host +
+                     " -p " + std::to_string(config.target.port) +
+                     " -U " + config.target.username +
+                     " -d " + config.target.database +
+                     " " + config.source_path;
+    return system(cmd.c_str()) == 0;
+}
+
+std::vector<std::string> PostgresAdapter::list_databases(const DbConnection& conn) {
+    std::vector<std::string> dbs;
+    std::string cmd = "psql -h " + conn.host + " -p " + std::to_string(conn.port) +
+                     " -U " + conn.username + " -t -A -c \"SELECT datname FROM pg_database WHERE datistemplate = false\"";
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (pipe) {
+        char buf[256];
+        while (fgets(buf, sizeof(buf), pipe)) {
+            std::string line(buf);
+            if (!line.empty() && line.back() == '\n') line.pop_back();
+            if (!line.empty()) dbs.push_back(line);
+        }
+        pclose(pipe);
+    }
+    return dbs;
+}
+
+std::vector<std::string> PostgresAdapter::list_tables(const DbConnection& conn, const std::string& database) {
+    std::vector<std::string> tables;
+    std::string cmd = "psql -h " + conn.host + " -p " + std::to_string(conn.port) +
+                     " -U " + conn.username + " -d " + database +
+                     " -t -A -c \"SELECT tablename FROM pg_tables WHERE schemaname = 'public'\"";
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (pipe) {
+        char buf[256];
+        while (fgets(buf, sizeof(buf), pipe)) {
+            std::string line(buf);
+            if (!line.empty() && line.back() == '\n') line.pop_back();
+            if (!line.empty()) tables.push_back(line);
+        }
+        pclose(pipe);
+    }
+    return tables;
+}
+
+std::string PostgresAdapter::build_conn_string(const DbConnection& conn) {
+    return "host=" + conn.host + " port=" + std::to_string(conn.port) +
+           " user=" + conn.username + " password=" + conn.password;
+}
+
+bool PostgresAdapter::run_pg_dump(const BackupConfig& config, BackupProgressCallback callback) {
+    std::string cmd = "pg_dump -h " + config.connection.host +
+                     " -p " + std::to_string(config.connection.port) +
+                     " -U " + config.connection.username +
+                     " -Fp " + config.output_path;
+    return system(cmd.c_str()) == 0;
+}
+
+bool PostgresAdapter::run_pg_restore(const RestoreConfig& config, BackupProgressCallback callback) {
+    return restore(config, callback);
+}
+
 } // namespace obs

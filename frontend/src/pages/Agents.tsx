@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Tag, Input, Select, Button, Modal, Tabs, Space, Typography, Descriptions, Badge } from 'antd';
-import { SearchOutlined, ReloadOutlined, CloudServerOutlined, UpOutlined } from '@ant-design/icons';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Table, Tag, Input, Select, Button, Badge, Space, Typography, message } from 'antd';
+import { SearchOutlined, ReloadOutlined, CloudDownloadOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '../utils/api';
 import { useAgentStore } from '../stores/agentStore';
-import ReactECharts from 'echarts-for-react';
+import AgentDetailModal from '../components/AgentDetailModal';
 
 const { Title, Text } = Typography;
 
@@ -15,28 +15,28 @@ export default function Agents() {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const fetchAgents = async () => {
+  const fetchAgents = useCallback(async () => {
     setLoading(true);
     try {
       const params: any = {};
-      if (search) params.status = search;
+      if (search) params.search = search;
       if (statusFilter) params.status = statusFilter;
-      const res = await axios.get('/api/agents', { params });
+      const res = await api.get('/api/agents', { params });
       setAgents(res.data);
-    } catch {}
+    } catch (err: any) {
+      message.error('Failed to load agents');
+    }
     setLoading(false);
-  };
+  }, [search, statusFilter]);
 
-  useEffect(() => {
-    fetchAgents();
-  }, [statusFilter]);
+  useEffect(() => { fetchAgents(); }, [fetchAgents]);
 
   const columns = [
     {
       title: 'Hostname',
       dataIndex: 'hostname',
       key: 'hostname',
-      render: (text: string) => <Text strong style={{ color: '#00E5FF' }}>{text}</Text>,
+      render: (text: string) => <Text strong style={{ color: '#00E5FF', cursor: 'pointer' }}>{text}</Text>,
     },
     { title: 'IP', dataIndex: 'ip', key: 'ip' },
     { title: 'OS', dataIndex: 'os_type', key: 'os_type', render: (t: string) => <Tag>{t}</Tag> },
@@ -75,9 +75,8 @@ export default function Agents() {
       render: (_: any, record: any) => (
         <Space>
           <Button size="small" onClick={() => { setSelectedAgent(record); setModalOpen(true); }}>
-            Details
+            Manage
           </Button>
-          <Button size="small" icon={<UpOutlined />}>Upgrade</Button>
         </Space>
       ),
     },
@@ -85,7 +84,10 @@ export default function Agents() {
 
   return (
     <div>
-      <Title level={4} style={{ color: '#E6E6E6', marginBottom: 24 }}>Agents</Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <Title level={4} style={{ color: '#E6E6E6', margin: 0 }}>Agents</Title>
+      </div>
+
       <Space style={{ marginBottom: 16 }}>
         <Input.Search
           placeholder="Search agents..."
@@ -118,57 +120,11 @@ export default function Agents() {
         />
       </motion.div>
 
-      <Modal
-        title={selectedAgent?.hostname}
+      <AgentDetailModal
+        agent={selectedAgent}
         open={modalOpen}
-        onCancel={() => setModalOpen(false)}
-        footer={null}
-        width={700}
-        styles={{ body: { background: 'transparent' } }}
-      >
-        {selectedAgent && (
-          <Tabs
-            items={[
-              {
-                key: 'info',
-                label: 'Info',
-                children: (
-                  <Descriptions bordered column={2} size="small">
-                    <Descriptions.Item label="Hostname">{selectedAgent.hostname}</Descriptions.Item>
-                    <Descriptions.Item label="IP">{selectedAgent.ip}</Descriptions.Item>
-                    <Descriptions.Item label="OS">{selectedAgent.os_type}</Descriptions.Item>
-                    <Descriptions.Item label="Version">{selectedAgent.version}</Descriptions.Item>
-                    <Descriptions.Item label="Core">{selectedAgent.core_version}</Descriptions.Item>
-                    <Descriptions.Item label="Transport">{selectedAgent.transport_mode}</Descriptions.Item>
-                  </Descriptions>
-                ),
-              },
-              {
-                key: 'traffic',
-                label: 'Traffic',
-                children: (
-                  <ReactECharts
-                    style={{ height: 250 }}
-                    option={{
-                      backgroundColor: 'transparent',
-                      series: [{
-                        type: 'gauge',
-                        progress: { show: true, width: 14 },
-                        min: 0, max: 100,
-                        axisLine: { lineStyle: { width: 14, color: [[1, 'rgba(255,255,255,0.1)']] } },
-                        pointer: { show: false },
-                        detail: { valueAnimation: true, fontSize: 24, formatter: '{value}%', color: '#00FF88', offsetCenter: [0, '10%'] },
-                        data: [{ value: (selectedAgent.cache_hit_ratio * 100).toFixed(0) as any }],
-                      }],
-                      title: { text: 'Cache Hit Ratio', left: 'center', textStyle: { color: '#8B949E' } },
-                    }}
-                  />
-                ),
-              },
-            ]}
-          />
-        )}
-      </Modal>
+        onClose={() => { setModalOpen(false); setSelectedAgent(null); fetchAgents(); }}
+      />
     </div>
   );
 }

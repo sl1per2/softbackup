@@ -20,7 +20,9 @@ export default function Jobs() {
     try {
       const res = await axios.get('/api/jobs', { params: filters });
       setJobs(res.data);
-    } catch {}
+    } catch {
+      message.error('Failed to load jobs');
+    }
     setLoading(false);
   }, [filters]);
 

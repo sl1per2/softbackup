@@ -9,7 +9,7 @@ from app.core.audit_middleware import AuditMiddleware
 from app.core.rate_limit import RateLimitMiddleware
 from app.api import auth, agents, storages, policies, jobs, agent_api, dashboard, traffic, zabbix, audit
 from app.api import replication, rescue, metrics_export, ldap, siem, tape, storage_tiers, virtualization, dbms, mail, os_backup, directory, gfs, agents_download
-from app.api import surebackup, backup_copy, tape_library as tape_lib, immutability, malware, dr, replication_v2, self_service, k8s, adhoc_backup
+from app.api import surebackup, backup_copy, tape_library as tape_lib, immutability, malware, dr, replication_v2, self_service, k8s, adhoc_backup, dirty_buffers, agent_control
 import asyncio
 
 
@@ -89,6 +89,8 @@ app.include_router(replication_v2.router)
 app.include_router(self_service.router)
 app.include_router(k8s.router)
 app.include_router(adhoc_backup.router)
+app.include_router(dirty_buffers.router)
+app.include_router(agent_control.router)
 
 
 @app.get("/health")
@@ -134,3 +136,15 @@ async def traffic_ws(websocket: WebSocket):
             await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(websocket, "traffic")
+
+
+@app.websocket("/ws/agent-logs/{agent_id}")
+async def agent_logs_ws(websocket: WebSocket, agent_id: int):
+    await manager.connect(websocket, f"agent-logs-{agent_id}")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            if data == "subscribe":
+                pass
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, f"agent-logs-{agent_id}")

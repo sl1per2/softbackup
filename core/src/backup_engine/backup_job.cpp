@@ -1,4 +1,6 @@
 #include "backup_engine/backup_job.h"
+#include "backup_engine/dirty_buffer_logger.h"
+#include "backup_engine/platform_flusher.h"
 #include <fstream>
 #include <filesystem>
 #include <spdlog/spdlog.h>
@@ -38,8 +40,41 @@ bool BackupJob::should_exclude(const std::string& path) const {
     return false;
 }
 
+void BackupJob::flush_dirty_buffers_before_backup() {
+    if (!dirty_buffer_logger_) {
+        spdlog::debug("Job {}: no dirty buffer logger, skipping flush", config_.job_id);
+        return;
+    }
+
+    spdlog::info("Job {}: flushing dirty buffers before backup (plugin={})",
+                 config_.job_id, config_.plugin_name);
+
+    PlatformBufferFlusher flusher(config_.plugin_name);
+    auto result = dirty_buffer_logger_->flush_and_log(
+        config_.job_id, config_.agent_id, &flusher);
+
+    {
+        std::lock_guard<std::mutex> lock(metrics_mutex_);
+        metrics_.dirty_buffer_flush_ms = result.flush_duration_ms;
+        metrics_.dirty_buffer_flushed = (result.status == FlushStatus::FLUSHED);
+        metrics_.dirty_buffer_consistency = to_string(result.consistency);
+    }
+
+    if (result.status == FlushStatus::FLUSHED) {
+        spdlog::info("Job {}: dirty buffer flush completed ({} ms, {})",
+                     config_.job_id, result.flush_duration_ms,
+                     to_string(result.consistency));
+    } else {
+        spdlog::warn("Job {}: dirty buffer flush did not succeed ({}), proceeding with backup",
+                     config_.job_id, to_string(result.status));
+    }
+}
+
 void BackupJob::do_backup() {
     try {
+        flush_dirty_buffers_before_backup();
+        if (cancelled_) return;
+
         uint64_t total_size = 0;
         int32_t total_chunks = 0;
 

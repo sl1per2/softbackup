@@ -13,9 +13,11 @@ export default function Rescue() {
 
   const fetchImages = async () => {
     try {
-      const resp = await api.get('/api/rescue/list');
+      const resp = await api.get('/api/rescue/images');
       setImages(resp.data.images || []);
-    } catch {}
+    } catch {
+      message.error('Failed to load rescue images');
+    }
   };
 
   useEffect(() => { fetchImages(); }, []);

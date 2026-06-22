@@ -16,14 +16,16 @@ export default function MailSystems() {
   const [connectOpen, setConnectOpen] = useState(false);
   const [form] = Form.useForm();
 
-  const fetchSystems = async () => {
+  const fetchSystems = useCallback(async () => {
     setLoading(true);
     try {
       const resp = await api.get('/api/mail/supported');
       setSystems(resp.data.systems || []);
-    } catch {}
+    } catch {
+      message.error('Failed to load mail systems');
+    }
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => { fetchSystems(); }, []);
 

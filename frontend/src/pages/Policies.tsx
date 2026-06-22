@@ -21,7 +21,9 @@ export default function Policies() {
       if (search) params.search = search;
       const res = await axios.get('/api/policies', { params });
       setPolicies(res.data);
-    } catch {}
+    } catch {
+      message.error('Failed to load policies');
+    }
     setLoading(false);
   };
 
@@ -38,7 +40,11 @@ export default function Policies() {
       message.success('Policy saved');
       setModalOpen(false);
       fetchPolicies();
-    } catch {}
+    } catch (err: any) {
+      if (err.response?.data?.detail) {
+        message.error(err.response.data.detail);
+      }
+    }
   };
 
   const handleRun = async (id: number) => {

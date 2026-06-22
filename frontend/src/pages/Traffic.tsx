@@ -25,7 +25,9 @@ export default function TrafficPage() {
         setStats(s.data);
         setCacheStats(c.data);
         setBandwidth(b.data);
-      } catch {}
+      } catch {
+        message.error('Failed to load traffic data');
+      }
     };
     load();
   }, [filters]);

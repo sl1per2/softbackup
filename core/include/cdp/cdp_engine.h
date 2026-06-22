@@ -1,5 +1,6 @@
 #pragma once
 #include "common.h"
+#include "engine/i_cdp_engine.h"
 #include <sqlite3.h>
 #include <thread>
 
@@ -26,7 +27,7 @@ struct CdpSessionInfo {
     std::string started_at;
 };
 
-struct RecoveryPoint {
+struct CdpDetailedRecoveryPoint {
     std::string id;
     std::string session_id;
     std::string timestamp;
@@ -41,16 +42,21 @@ struct BlockChange {
     std::string timestamp;
 };
 
-class CdpEngine {
+class CdpEngine : public ICdpEngine {
 public:
     CdpEngine();
-    ~CdpEngine();
+    ~CdpEngine() override;
 
-    std::string start_session(const CdpSessionConfig& config);
-    void stop_session(const std::string& session_id);
+    std::string component_name() const override { return "CdpEngine"; }
+    void initialize() override;
+    void shutdown() override;
+
+    std::string start_session(const CdpConfig& config) override;
+    void stop_session(const std::string& session_id) override;
+    std::vector<CdpRecoveryPoint> get_recovery_points(const std::string& session_id) override;
+    bool restore_to_point(const std::string& session_id, const std::string& recovery_point_id) override;
+
     CdpSessionInfo get_session_status(const std::string& session_id);
-    std::vector<RecoveryPoint> get_recovery_points(const std::string& session_id);
-    bool restore_to_point(const std::string& session_id, const std::string& recovery_point_id);
 
 private:
     void monitor_loop(const std::string& session_id);

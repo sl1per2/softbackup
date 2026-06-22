@@ -18,14 +18,16 @@ export default function Databases() {
   const [connectOpen, setConnectOpen] = useState(false);
   const [form] = Form.useForm();
 
-  const fetchDatabases = async () => {
+  const fetchDatabases = useCallback(async () => {
     setLoading(true);
     try {
       const resp = await api.get('/api/dbms/supported');
       setDatabases(resp.data.databases || []);
-    } catch {}
+    } catch {
+      message.error('Failed to load database list');
+    }
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => { fetchDatabases(); }, []);
 

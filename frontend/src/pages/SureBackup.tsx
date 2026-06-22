@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, Table, Tag, Button, Space, Row, Col, Statistic, Progress, message } from 'antd';
 import { SafetyCertificateOutlined, CheckCircleOutlined, WarningOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
@@ -7,13 +7,19 @@ import api from '../utils/api';
 export default function SureBackup() {
   const [results, setResults] = useState<any[]>([]);
   const [summary, setSummary] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
       const [r, s] = await Promise.all([api.get('/api/surebackup/results'), api.get('/api/surebackup/summary')]);
       setResults(r.data.results || []);
       setSummary(s.data);
-    } catch {}
+    } catch {
+      message.error('Failed to load SureBackup data');
+    }
+    setLoading(false);
+  }, []);
   };
 
   useEffect(() => { fetchData(); }, []);

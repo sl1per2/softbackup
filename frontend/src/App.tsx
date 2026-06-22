@@ -27,6 +27,7 @@ import BackupCopyPage from './pages/BackupCopy';
 import MalwarePage from './pages/Malware';
 import DisasterRecoveryPage from './pages/DisasterRecovery';
 import VMReplicationPage from './pages/VMReplication';
+import DirtyBuffersPage from './pages/DirtyBuffers';
 import { useAuthStore } from './stores/authStore';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -70,6 +71,7 @@ export default function App() {
                 <Route path="/malware" element={<MalwarePage />} />
                 <Route path="/disaster-recovery" element={<DisasterRecoveryPage />} />
                 <Route path="/vm-replication" element={<VMReplicationPage />} />
+                <Route path="/dirty-buffers" element={<DirtyBuffersPage />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </AppLayout>

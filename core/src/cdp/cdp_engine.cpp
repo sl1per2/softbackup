@@ -14,10 +14,18 @@ static std::string gen_session_id() {
 }
 
 CdpEngine::CdpEngine() {
-    init_journal_db();
 }
 
 CdpEngine::~CdpEngine() {
+    shutdown();
+}
+
+void CdpEngine::initialize() {
+    init_journal_db();
+    mark_initialized();
+}
+
+void CdpEngine::shutdown() {
     {
         std::lock_guard<std::mutex> lock(sessions_mutex_);
         for (auto& [id, session] : sessions_) {
@@ -32,7 +40,10 @@ CdpEngine::~CdpEngine() {
             }
         }
     }
-    if (journal_db_) sqlite3_close(journal_db_);
+    if (journal_db_) {
+        sqlite3_close(journal_db_);
+        journal_db_ = nullptr;
+    }
 }
 
 void CdpEngine::init_journal_db() {
@@ -68,10 +79,16 @@ void CdpEngine::init_journal_db() {
     }
 }
 
-std::string CdpEngine::start_session(const CdpSessionConfig& config) {
+std::string CdpEngine::start_session(const CdpConfig& config) {
+    CdpSessionConfig session_config;
+    session_config.policy_id = config.session_id;
+    session_config.source_path = config.source_path;
+    session_config.interval_seconds = config.interval_ms / 1000;
+    session_config.retention_minutes = config.retention_minutes;
+
     auto session = std::make_shared<Session>();
-    session->config = config;
-    session->info.session_id = gen_session_id();
+    session->config = session_config;
+    session->info.session_id = config.session_id.empty() ? gen_session_id() : config.session_id;
     session->info.status = CdpStatus::ACTIVE;
     session->info.started_at = current_time_string();
     session->running = true;
@@ -106,8 +123,8 @@ CdpSessionInfo CdpEngine::get_session_status(const std::string& session_id) {
     return it->second->info;
 }
 
-std::vector<RecoveryPoint> CdpEngine::get_recovery_points(const std::string& session_id) {
-    std::vector<RecoveryPoint> points;
+std::vector<CdpRecoveryPoint> CdpEngine::get_recovery_points(const std::string& session_id) {
+    std::vector<CdpRecoveryPoint> points;
     std::lock_guard<std::mutex> lock(journal_mutex_);
     const char* sql = "SELECT id, session_id, timestamp, block_count, size_bytes, is_consistent "
                       "FROM recovery_points WHERE session_id = ? ORDER BY timestamp";
@@ -116,11 +133,9 @@ std::vector<RecoveryPoint> CdpEngine::get_recovery_points(const std::string& ses
     sqlite3_bind_text(stmt, 1, session_id.c_str(), -1, SQLITE_STATIC);
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        RecoveryPoint rp;
+        CdpRecoveryPoint rp;
         rp.id = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-        rp.session_id = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
         rp.timestamp = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-        rp.block_count = sqlite3_column_int64(stmt, 3);
         rp.size_bytes = sqlite3_column_int64(stmt, 4);
         rp.is_consistent = sqlite3_column_int(stmt, 5) != 0;
         points.push_back(rp);

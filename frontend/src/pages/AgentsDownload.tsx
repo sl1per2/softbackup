@@ -40,7 +40,9 @@ export default function AgentsDownload() {
     try {
       const resp = await api.get('/agents-download/list');
       setAgents(resp.data.agents || []);
-    } catch {}
+    } catch {
+      message.error('Failed to load agent downloads');
+    }
     setLoading(false);
   };
 
@@ -58,7 +60,9 @@ export default function AgentsDownload() {
     try {
       const resp = await api.get(`/agents-download/install-script/${osType}`);
       setInstallScript(resp.data);
-    } catch {}
+    } catch {
+      message.error('Failed to load install script');
+    }
   };
 
   const copyScript = () => {

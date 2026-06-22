@@ -9,6 +9,7 @@ import {
   TeamOutlined, HistoryOutlined, DownloadOutlined, SafetyOutlined,
   ThunderboltOutlined, MenuFoldOutlined,
   MenuUnfoldOutlined, QuestionCircleOutlined, GlobalOutlined,
+  ClearOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '../stores/authStore';
 import { useNotificationStore } from '../stores/notificationStore';
@@ -58,6 +59,7 @@ export default function AppLayout({ children }: Props) {
   { key: '/malware', icon: <SafetyOutlined />, label: 'Malware' },
   { key: '/disaster-recovery', icon: <ThunderboltOutlined />, label: 'DR Plans' },
   { key: '/vm-replication', icon: <SyncOutlined />, label: 'VM Replication' },
+  { key: '/dirty-buffers', icon: <ClearOutlined />, label: 'Dirty Buffers' },
 ];
 
   const userMenuItems = [

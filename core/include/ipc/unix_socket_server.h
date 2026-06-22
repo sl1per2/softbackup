@@ -1,32 +1,33 @@
 #pragma once
 #include "common.h"
+#include "ipc/i_ipc_server.h"
 #include <boost/asio.hpp>
-#include <functional>
-#include <unordered_map>
+#include <thread>
 
 namespace obs {
 
-class MessageHandler;
-using MessageHandlerFunc = std::function<std::vector<uint8_t>(const std::vector<uint8_t>&)>;
-
-class UnixSocketServer {
+class UnixSocketServer : public IIpcServer {
 public:
     UnixSocketServer(boost::asio::io_context& io_ctx, const std::string& socket_path);
-    ~UnixSocketServer();
+    ~UnixSocketServer() override;
 
-    void start();
-    void stop();
-    void register_handler(uint32_t message_type, MessageHandlerFunc handler);
+    void initialize() override;
+    void shutdown() override;
+    void start() override;
+    void stop() override;
+    void register_handler(uint32_t message_type, IpcHandler handler) override;
+    bool is_running() const override { return running_.load(); }
+    std::string component_name() const override { return "UnixSocketServer"; }
 
 private:
     void do_accept();
     void handle_session(std::shared_ptr<boost::asio::local::stream_protocol::socket> socket);
 
     boost::asio::io_context& io_ctx_;
-    boost::asio::local::stream_protocol::acceptor acceptor_;
     std::string socket_path_;
+    std::unique_ptr<boost::asio::local::stream_protocol::acceptor> acceptor_;
     std::atomic<bool> running_{false};
-    std::unordered_map<uint32_t, MessageHandlerFunc> handlers_;
+    std::unordered_map<uint32_t, IpcHandler> handlers_;
     mutable std::mutex handlers_mutex_;
 };
 

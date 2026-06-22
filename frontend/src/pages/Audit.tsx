@@ -17,7 +17,9 @@ export default function AuditPage() {
     try {
       const res = await axios.get('/api/audit', { params: filters });
       setLogs(res.data);
-    } catch {}
+    } catch {
+      message.error('Failed to load audit logs');
+    }
     setLoading(false);
   };
 

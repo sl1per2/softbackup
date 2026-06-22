@@ -18,7 +18,9 @@ export default function Storages() {
     try {
       const res = await axios.get('/api/storages');
       setStorages(res.data);
-    } catch {}
+    } catch {
+      message.error('Failed to load storages');
+    }
     setLoading(false);
   };
 
@@ -35,7 +37,11 @@ export default function Storages() {
       message.success('Storage saved');
       setModalOpen(false);
       fetchStorages();
-    } catch {}
+    } catch (err: any) {
+      if (err.response?.data?.detail) {
+        message.error(err.response.data.detail);
+      }
+    }
   };
 
   const handleTest = async (id: number) => {

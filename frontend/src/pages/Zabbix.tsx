@@ -23,7 +23,9 @@ export default function ZabbixPage() {
         setConfig(cfg.data);
         form.setFieldsValue(cfg.data);
         setTriggers(trig.data?.triggers || []);
-      } catch {}
+      } catch {
+        message.error('Failed to load Zabbix configuration');
+      }
     };
     load();
   }, []);
@@ -33,7 +35,9 @@ export default function ZabbixPage() {
       const values = await form.validateFields();
       await axios.put('/api/zabbix/config', values);
       message.success('Zabbix config saved');
-    } catch {}
+    } catch {
+      message.error('Failed to save Zabbix configuration');
+    }
   };
 
   const handleTest = async () => {

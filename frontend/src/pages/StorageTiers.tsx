@@ -16,9 +16,11 @@ export default function StorageTiers() {
   const fetchTiers = async () => {
     setLoading(true);
     try {
-      const resp = await api.get('/api/storage-tiers/stats');
-      setTiers(resp.data);
-    } catch {}
+      const resp = await api.get('/api/storage-tiers');
+      setTiers(resp.data.tiers || []);
+    } catch {
+      message.error('Failed to load storage tiers');
+    }
     setLoading(false);
   };
 

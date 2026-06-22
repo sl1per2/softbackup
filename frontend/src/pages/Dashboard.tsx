@@ -40,7 +40,9 @@ export default function Dashboard() {
         setSummary(s.data);
         setChartData(c.data);
         setRecentJobs(j.data);
-      } catch {}
+      } catch {
+        message.error('Failed to load dashboard data');
+      }
     };
     loadData();
     const interval = setInterval(loadData, 30000);

@@ -6,6 +6,8 @@
 
 namespace obs {
 
+class DirtyBufferLogger;
+
 enum class JobType { FULL, INCREMENTAL, DIFFERENTIAL };
 enum class JobStatus { PENDING, RUNNING, COMPLETED, FAILED, CANCELLED };
 
@@ -18,6 +20,7 @@ struct BackupConfig {
     int compression_level = 1;
     bool encryption_enabled = false;
     int storage_id = 0;
+    std::string plugin_name = "generic";
 };
 
 struct JobMetrics {
@@ -30,6 +33,9 @@ struct JobMetrics {
     double cache_hit_ratio = 0.0;
     int32_t zero_blocks_skipped = 0;
     std::string transport_mode_used;
+    int64_t dirty_buffer_flush_ms = 0;
+    bool dirty_buffer_flushed = false;
+    std::string dirty_buffer_consistency;
 };
 
 class BackupJob {
@@ -45,10 +51,12 @@ public:
     JobMetrics get_metrics() const;
     std::string get_error() const { return error_; }
     void set_status_callback(StatusCallback cb) { callback_ = std::move(cb); }
+    void set_dirty_buffer_logger(DirtyBufferLogger* logger) { dirty_buffer_logger_ = logger; }
 
 private:
     void do_backup();
     bool should_exclude(const std::string& path) const;
+    void flush_dirty_buffers_before_backup();
 
     BackupConfig config_;
     std::atomic<JobStatus> status_{JobStatus::PENDING};
@@ -58,6 +66,7 @@ private:
     std::thread worker_;
     std::atomic<bool> cancelled_{false};
     StatusCallback callback_;
+    DirtyBufferLogger* dirty_buffer_logger_ = nullptr;
 };
 
 } // namespace obs

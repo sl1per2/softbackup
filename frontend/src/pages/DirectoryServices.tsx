@@ -15,8 +15,10 @@ export default function DirectoryServices() {
     setLoading(true);
     try {
       const resp = await api.get('/api/directory/supported');
-      setDirs(resp.data.directories || []);
-    } catch {}
+      setServices(resp.data.services || []);
+    } catch {
+      message.error('Failed to load directory services');
+    }
     setLoading(false);
   };
 
