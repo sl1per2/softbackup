@@ -1271,4 +1271,122 @@ POST /api/agents/deploy/winrm
 
 ---
 
+## 39. Сетевое обнаружение (Network Discovery)
+
+### 39.1 API
+
+```
+POST /api/discovery/scan     — сканирование подсети (IP scan, port check)
+GET  /api/discovery/subnets  — список сохранённых подсетей
+```
+
+### 39.2 Фронтенд
+
+Компонент `NetworkDiscovery` — ввод подсети (CIDR), сканирование порта 9900, таблица результатов с кнопкой "Install" / "Manage".
+
+---
+
+## 40. Деплой агентов (Agent Installer)
+
+### 40.1 API
+
+```
+POST /api/agent-installer/install  — запуск установки
+POST /api/agent-installer/check    — проверка наличия агента на хосте
+```
+
+### 40.2 Фронтенды
+
+| Компонент | Описание |
+|-----------|----------|
+| `InstallAgentPopup` | Модальное окно установки: хост, OS, credentials → 6-шаговый прогресс |
+| `BulkInstallProgress` | Массовая установка: таблица хостов, параллельный прогресс |
+| `PendingAgents` | Список ожидающих регистрации агентов (approve/reject) |
+
+---
+
+## 41. Удалённое редактирование конфигурации
+
+### 41.1 API
+
+```
+GET  /api/config-editor/schema/{agent_id}  — JSON Schema полей конфигурации
+GET  /api/config-editor/{agent_id}         — текущие значения
+PUT  /api/config-editor/{agent_id}         — обновление конфигурации
+```
+
+### 41.2 Фронтенд
+
+Компонент `AgentConfigEditor` — Drawer с формой: log_level, heartbeat, cache, concurrent jobs, bandwidth, chunk_size. Кнопки "Save" и "Apply Now" (restart agent).
+
+---
+
+## 42. Просмотр логов агентов
+
+### 42.1 API
+
+```
+GET  /api/log-viewer/{agent_id}           — логи с фильтрами (level, search, tail)
+GET  /api/log-viewer/{agent_id}/download  — скачивание полного лога
+```
+
+### 42.2 WebSocket
+
+```
+/ws/agent-commands     — команды агентам в реальном времени
+/ws/install-progress/{job_id} — прогресс установки агента
+/ws/agent-logs/{agent_id}     — логи агента в реальном времени
+```
+
+### 42.3 Фронтенд
+
+Компонент `AgentLogViewer` — Drawer с терминальным видом (чёрный фон, цветные строки), фильтр по уровню, поиск, auto-scroll, download.
+
+---
+
+## 43. Контекстное меню агента
+
+Компонент `AgentContextMenu` — правый клик по агенту в таблице:
+- Quick Backup
+- Stop All Jobs
+- Restart Agent
+- Update Agent
+- Edit Configuration
+- View Logs
+- Flush Dirty Buffers
+- Clear Chunk Cache
+
+---
+
+## 44. Миграции Alembic
+
+### 44.1 v002 — Dirty Buffers + Agent Control
+
+Таблицы:
+- `dirty_buffer_logs` — логи сброса грязных буферов
+- `agent_install_jobs` — задания на установку агентов
+- `agent_command_logs` — логи команд агентам
+
+```bash
+cd backend && alembic upgrade head
+```
+
+---
+
+## 45. Тесты (37 тестов)
+
+| Тест | Количество | Описание |
+|------|-----------|----------|
+| test_oop | 10 | ServiceRegistry, EventBus, CommandQueue, AgentFactory, EngineFactory, BackupPipeline, DedupEngine, CryptoEngine, CompressionEngine, AgentCanHandle |
+| test_dirty_buffer | 6 | Basic flush, partial flush, failed flush, queries, failed queries, JSON output |
+| test_esxi_agent | 7 | Creation, can_handle, config, list_vms, snapshot, changed_blocks, factory |
+| test_mssql_agent | 5 | Creation, can_handle, connection, factory, types |
+| test_pgsql_agent | 6 | Creation, can_handle, connection, continuous, factory, all_db_agents |
+
+```bash
+cd core/build && ctest --output-on-failure
+```
+
+---
+
 *OBS Backup v2.0.0 | 2026-06-22 | support@obs-backup.example.com*

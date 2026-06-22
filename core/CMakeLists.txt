@@ -278,6 +278,63 @@ endif()
 
 add_test(NAME oop_tests COMMAND test_oop)
 
+# ── Agent Tests ───────────────────────────────────────────────────────────────
+
+foreach(agent_test esxi mssql pgsql)
+    add_executable(test_${agent_test}_agent
+        tests/test_${agent_test}_agent.cpp
+        src/agent/generic_agent.cpp
+        src/agent/esxi_agent.cpp
+        src/agent/hyperv_agent.cpp
+        src/agent/mssql_agent.cpp
+        src/agent/postgresql_agent.cpp
+        src/agent/oracle_agent.cpp
+        src/agent/proxmox_agent.cpp
+        src/agent/saphana_agent.cpp
+        src/agent/kubernetes_agent.cpp
+        src/agent/linux_fs_agent.cpp
+        src/agent/windows_fs_agent.cpp
+        src/agent/ndmp_agent.cpp
+        src/agent/exchange_agent.cpp
+        src/dbms/postgres_adapter.cpp
+        src/dbms/mysql_adapter.cpp
+        src/dbms/mssql_adapter.cpp
+        src/dbms/oracle_adapter.cpp
+        src/dbms/mongodb_1c_adapters.cpp
+        src/dbms/other_dbms_adapters.cpp
+    )
+
+    target_include_directories(test_${agent_test}_agent PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_BINARY_DIR}
+        ${Protobuf_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
+        ${OPENSSL_INCLUDE_DIR}
+        ${ZLIB_INCLUDE_DIRS}
+        ${SPDLOG_INCLUDE_DIR}
+        ${FMT_INCLUDE_DIR}
+        ${SQLITE3_INCLUDE_DIRS}
+    )
+
+    target_link_libraries(test_${agent_test}_agent
+        OpenSSL::SSL
+        OpenSSL::Crypto
+        ZLIB::ZLIB
+        Threads::Threads
+        ${SQLITE3_LIBRARIES}
+        CURL::libcurl
+        ${FMT_LIBRARY}
+        ${SPDLOG_LIBRARY}
+    )
+
+    target_compile_definitions(test_${agent_test}_agent PRIVATE
+        SPDLOG_FMT_EXTERNAL
+        SPDLOG_COMPILED_LIB
+    )
+
+    add_test(NAME ${agent_test}_agent_tests COMMAND test_${agent_test}_agent)
+endforeach()
+
 # ── DirtyBufferLogger Test ─────────────────────────────────────────────────────
 
 add_executable(test_dirty_buffer

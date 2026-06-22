@@ -9,7 +9,7 @@ from app.core.audit_middleware import AuditMiddleware
 from app.core.rate_limit import RateLimitMiddleware
 from app.api import auth, agents, storages, policies, jobs, agent_api, dashboard, traffic, zabbix, audit
 from app.api import replication, rescue, metrics_export, ldap, siem, tape, storage_tiers, virtualization, dbms, mail, os_backup, directory, gfs, agents_download
-from app.api import surebackup, backup_copy, tape_library as tape_lib, immutability, malware, dr, replication_v2, self_service, k8s, adhoc_backup, dirty_buffers, agent_control
+from app.api import surebackup, backup_copy, tape_library as tape_lib, immutability, malware, dr, replication_v2, self_service, k8s, adhoc_backup, dirty_buffers, agent_control, discovery, agent_installer, config_editor, log_viewer
 import asyncio
 
 
@@ -91,6 +91,10 @@ app.include_router(k8s.router)
 app.include_router(adhoc_backup.router)
 app.include_router(dirty_buffers.router)
 app.include_router(agent_control.router)
+app.include_router(discovery.router)
+app.include_router(agent_installer.router)
+app.include_router(config_editor.router)
+app.include_router(log_viewer.router)
 
 
 @app.get("/health")
@@ -148,3 +152,28 @@ async def agent_logs_ws(websocket: WebSocket, agent_id: int):
                 pass
     except WebSocketDisconnect:
         manager.disconnect(websocket, f"agent-logs-{agent_id}")
+
+
+@app.websocket("/ws/agent-commands")
+async def agent_commands_ws(websocket: WebSocket):
+    await manager.connect(websocket, "agent-commands")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            import json
+            cmd = json.loads(data)
+            agent_id = cmd.get("agent_id")
+            command = cmd.get("command")
+            await websocket.send_json({"status": "sent", "command": command, "agent_id": agent_id})
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, "agent-commands")
+
+
+@app.websocket("/ws/install-progress/{job_id}")
+async def install_progress_ws(websocket: WebSocket, job_id: str):
+    await manager.connect(websocket, f"install-{job_id}")
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, f"install-{job_id}")
