@@ -7,9 +7,10 @@ import {
   AuditOutlined, SyncOutlined, CloudDownloadOutlined, SaveOutlined,
   HddOutlined, BellOutlined, UserOutlined, LogoutOutlined, MailOutlined,
   TeamOutlined, HistoryOutlined, DownloadOutlined, SafetyOutlined,
-  ThunderboltOutlined, MenuFoldOutlined,
-  MenuUnfoldOutlined, QuestionCircleOutlined, GlobalOutlined,
-  ClearOutlined,
+  ThunderboltOutlined, MenuFoldOutlined, MenuUnfoldOutlined,
+  QuestionCircleOutlined, GlobalOutlined, ClearOutlined,
+  DesktopOutlined, SettingOutlined, PartitionOutlined,
+  ToolOutlined, ApiOutlined as ApiIcon, SafetyCertificateOutlined as ShieldIcon,
 } from '@ant-design/icons';
 import { useAuthStore } from '../stores/authStore';
 import { useNotificationStore } from '../stores/notificationStore';
@@ -17,6 +18,7 @@ import { useLanguageStore } from '../stores/languageStore';
 import HelpDrawer from './HelpDrawer';
 
 const { Header, Sider, Content } = Layout;
+const { Text } = Typography;
 
 interface Props {
   children: React.ReactNode;
@@ -29,41 +31,104 @@ export default function AppLayout({ children }: Props) {
   const location = useLocation();
   const logout = useAuthStore((s) => s.logout);
   const unreadCount = useNotificationStore((s) => s.unreadCount);
-  const { lang, setLang, t } = useLanguageStore();
+  const { lang, setLang } = useLanguageStore();
 
   const currentSection = location.pathname.replace('/', '') || 'dashboard';
 
   const menuItems = [
-    { key: '/dashboard', icon: <DashboardOutlined />, label: t('nav.dashboard') },
-    { key: '/agents', icon: <CloudServerOutlined />, label: t('nav.agents') },
-    { key: '/policies', icon: <SafetyCertificateOutlined />, label: t('nav.policies') },
-    { key: '/jobs', icon: <FileSearchOutlined />, label: t('nav.jobs') },
-    { key: '/storages', icon: <DatabaseOutlined />, label: t('nav.storages') },
-    { key: '/storage-tiers', icon: <SaveOutlined />, label: t('nav.storageTiers') },
-    { key: '/replication', icon: <SyncOutlined />, label: t('nav.replication') },
-    { key: '/tape', icon: <HddOutlined />, label: t('nav.tape') },
-    { key: '/virtualization', icon: <CloudServerOutlined />, label: t('nav.virtualization') },
-    { key: '/databases', icon: <DatabaseOutlined />, label: t('nav.databases') },
-    { key: '/mail', icon: <MailOutlined />, label: t('nav.mail') },
-    { key: '/os-backup', icon: <HddOutlined />, label: t('nav.osBackup') },
-    { key: '/directory', icon: <TeamOutlined />, label: t('nav.directory') },
-    { key: '/gfs', icon: <HistoryOutlined />, label: t('nav.gfs') },
-    { key: '/rescue', icon: <CloudDownloadOutlined />, label: t('nav.rescue') },
-    { key: '/traffic', icon: <LineChartOutlined />, label: t('nav.traffic') },
-    { key: '/audit', icon: <AuditOutlined />, label: t('nav.audit') },
-    { key: '/zabbix', icon: <ApiOutlined />, label: t('nav.zabbix') },
-  { key: '/users', icon: <TeamOutlined />, label: t('nav.users') },
-  { key: '/agents-download', icon: <DownloadOutlined />, label: t('nav.agentsDownload') },
-  { key: '/surebackup', icon: <SafetyCertificateOutlined />, label: 'SureBackup' },
-  { key: '/backup-copy', icon: <SyncOutlined />, label: 'Backup Copy' },
-  { key: '/malware', icon: <SafetyOutlined />, label: 'Malware' },
-  { key: '/disaster-recovery', icon: <ThunderboltOutlined />, label: 'DR Plans' },
-  { key: '/vm-replication', icon: <SyncOutlined />, label: 'VM Replication' },
-  { key: '/dirty-buffers', icon: <ClearOutlined />, label: 'Dirty Buffers' },
-];
+    {
+      key: 'overview',
+      type: 'group' as const,
+      label: collapsed ? '' : 'OVERVIEW',
+      children: [
+        { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+      ],
+    },
+    {
+      key: 'agents-section',
+      type: 'group' as const,
+      label: collapsed ? '' : 'AGENTS',
+      children: [
+        { key: '/agents', icon: <CloudServerOutlined />, label: 'Agent Management' },
+        { key: '/agents-download', icon: <DownloadOutlined />, label: 'Agent Deployment' },
+        { key: '/dirty-buffers', icon: <ClearOutlined />, label: 'Dirty Buffers' },
+      ],
+    },
+    {
+      key: 'backup-section',
+      type: 'group' as const,
+      label: collapsed ? '' : 'BACKUP & POLICIES',
+      children: [
+        { key: '/policies', icon: <SafetyCertificateOutlined />, label: 'Backup Policies' },
+        { key: '/jobs', icon: <FileSearchOutlined />, label: 'Backup Jobs' },
+        { key: '/backup-copy', icon: <SyncOutlined />, label: 'Backup Copy' },
+        { key: '/gfs', icon: <HistoryOutlined />, label: 'GFS Retention' },
+      ],
+    },
+    {
+      key: 'storage-section',
+      type: 'group' as const,
+      label: collapsed ? '' : 'STORAGE',
+      children: [
+        { key: '/storages', icon: <DatabaseOutlined />, label: 'Storage Targets' },
+        { key: '/storage-tiers', icon: <SaveOutlined />, label: 'Storage Tiers' },
+        { key: '/tape', icon: <HddOutlined />, label: 'Tape Library' },
+      ],
+    },
+    {
+      key: 'sources-section',
+      type: 'group' as const,
+      label: collapsed ? '' : 'DATA SOURCES',
+      children: [
+        { key: '/virtualization', icon: <CloudServerOutlined />, label: 'Virtualization' },
+        { key: '/databases', icon: <DatabaseOutlined />, label: 'Databases' },
+        { key: '/mail', icon: <MailOutlined />, label: 'Mail Systems' },
+        { key: '/os-backup', icon: <DesktopOutlined />, label: 'OS / Filesystem' },
+        { key: '/directory', icon: <TeamOutlined />, label: 'Directory Services' },
+      ],
+    },
+    {
+      key: 'replication-section',
+      type: 'group' as const,
+      label: collapsed ? '' : 'REPLICATION & DR',
+      children: [
+        { key: '/replication', icon: <SyncOutlined />, label: 'Storage Replication' },
+        { key: '/vm-replication', icon: <SyncOutlined />, label: 'VM Replication' },
+        { key: '/disaster-recovery', icon: <ThunderboltOutlined />, label: 'DR Plans' },
+        { key: '/rescue', icon: <CloudDownloadOutlined />, label: 'Rescue Media' },
+      ],
+    },
+    {
+      key: 'security-section',
+      type: 'group' as const,
+      label: collapsed ? '' : 'SECURITY',
+      children: [
+        { key: '/surebackup', icon: <SafetyCertificateOutlined />, label: 'SureBackup' },
+        { key: '/malware', icon: <SafetyOutlined />, label: 'Malware Detection' },
+      ],
+    },
+    {
+      key: 'monitoring-section',
+      type: 'group' as const,
+      label: collapsed ? '' : 'MONITORING & AUDIT',
+      children: [
+        { key: '/traffic', icon: <LineChartOutlined />, label: 'Traffic Analytics' },
+        { key: '/zabbix', icon: <ApiOutlined />, label: 'Zabbix Integration' },
+        { key: '/audit', icon: <AuditOutlined />, label: 'Audit Log' },
+      ],
+    },
+    {
+      key: 'admin-section',
+      type: 'group' as const,
+      label: collapsed ? '' : 'ADMINISTRATION',
+      children: [
+        { key: '/users', icon: <UserOutlined />, label: 'Users' },
+      ],
+    },
+  ];
 
   const userMenuItems = [
-    { key: 'logout', icon: <LogoutOutlined />, label: t('nav.users') === 'Пользователи' ? 'Выйти' : 'Logout', onClick: () => { logout(); navigate('/login'); } },
+    { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', onClick: () => { logout(); navigate('/login'); } },
   ];
 
   const langMenuItems = [
@@ -100,9 +165,17 @@ export default function AppLayout({ children }: Props) {
           theme="dark"
           mode="inline"
           selectedKeys={[location.pathname]}
+          defaultOpenKeys={[
+            'overview', 'agents-section', 'backup-section', 'storage-section',
+            'sources-section', 'replication-section', 'security-section',
+            'monitoring-section', 'admin-section',
+          ]}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
-          style={{ background: 'transparent', borderRight: 'none' }}
+          style={{
+            background: 'transparent',
+            borderRight: 'none',
+          }}
         />
       </Sider>
       <Layout>
