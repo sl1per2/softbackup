@@ -16,7 +16,7 @@ export default function StorageTiers() {
   const fetchTiers = async () => {
     setLoading(true);
     try {
-      const resp = await api.get('/api/storage-tiers');
+      const resp = await api.get('/storage-tiers');
       setTiers(resp.data.tiers || []);
     } catch {
       message.error('Failed to load storage tiers');
@@ -28,7 +28,7 @@ export default function StorageTiers() {
 
   const handleRunTiering = async () => {
     try {
-      await api.post('/api/storage-tiers/run-tiering');
+      await api.post('/storage-tiers/run-tiering');
       message.success('Tiering job started');
       fetchTiers();
     } catch {

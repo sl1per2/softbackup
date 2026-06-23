@@ -26,7 +26,7 @@ export default function NetworkDiscovery({ onSelect }: Props) {
   const handleScan = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.post('/api/discovery/scan', { subnet, port: 9900, timeout_ms: 500 });
+      const res = await api.post('/discovery/scan', { subnet, port: 9900, timeout_ms: 500 });
       setHosts(res.data);
       message.info(`Found ${res.data.length} hosts`);
     } catch {

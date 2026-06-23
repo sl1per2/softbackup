@@ -12,7 +12,7 @@ export default function PendingAgents() {
   const fetchPending = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/api/agents', { params: { status: 'pending' } });
+      const res = await api.get('/agents', { params: { status: 'pending' } });
       setAgents(res.data || []);
     } catch {
       message.error('Failed to load pending agents');
@@ -24,7 +24,7 @@ export default function PendingAgents() {
 
   const handleApprove = async (agentId: number) => {
     try {
-      await api.post(`/api/agents/${agentId}/approve`);
+      await api.post(`/agents/${agentId}/approve`);
       message.success('Agent approved');
       fetchPending();
     } catch {
@@ -34,7 +34,7 @@ export default function PendingAgents() {
 
   const handleReject = async (agentId: number) => {
     try {
-      await api.post(`/api/agents/${agentId}/reject`);
+      await api.post(`/agents/${agentId}/reject`);
       message.success('Agent rejected');
       fetchPending();
     } catch {

@@ -24,7 +24,7 @@ export default function AgentContextMenu({ agent, onAction }: Props) {
         onOk: async () => {
           setLoading(command);
           try {
-            await api.post(`/api/agents/${agent.id}/command/${command}`);
+            await api.post(`/agents/${agent.id}/command/${command}`);
             message.success(`Command "${command}" sent`);
             onAction(command);
           } catch {
@@ -36,7 +36,7 @@ export default function AgentContextMenu({ agent, onAction }: Props) {
     } else {
       setLoading(command);
       try {
-        await api.post(`/api/agents/${agent.id}/command/${command}`);
+        await api.post(`/agents/${agent.id}/command/${command}`);
         message.success(`Command "${command}" sent`);
         onAction(command);
       } catch {

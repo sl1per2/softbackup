@@ -75,10 +75,10 @@ export default function Virtualization() {
     setLoading(true);
     try {
       const [vmResp, connResp, jobResp, featResp] = await Promise.all([
-        api.get('/api/virtualization/vms'),
-        api.get('/api/virtualization/hypervisors'),
-        api.get('/api/virtualization/backup-jobs'),
-        api.get('/api/virtualization/features'),
+        api.get('/virtualization/vms'),
+        api.get('/virtualization/hypervisors'),
+        api.get('/virtualization/backup-jobs'),
+        api.get('/virtualization/features'),
       ]);
       setVMs(vmResp.data);
       setHypervisors(connResp.data);
@@ -95,7 +95,7 @@ export default function Virtualization() {
   const handleAddConnection = async () => {
     const values = await form.validateFields();
     try {
-      await api.post('/api/virtualization/hypervisors', values);
+      await api.post('/virtualization/hypervisors', values);
       message.success('Hypervisor connected');
       setAddConnOpen(false);
       form.resetFields();
@@ -107,7 +107,7 @@ export default function Virtualization() {
 
   const handleBackup = async (vmId: string) => {
     try {
-      await api.post(`/api/virtualization/vms/${vmId}/backup`, {
+      await api.post(`/virtualization/vms/${vmId}/backup`, {
         vm_id: vmId,
         storage_id: 'local',
         transport: 'NETWORK',
@@ -122,7 +122,7 @@ export default function Virtualization() {
 
   const handlePowerAction = async (vmId: string, action: string) => {
     try {
-      await api.post(`/api/virtualization/vms/${vmId}/power/${action}`);
+      await api.post(`/virtualization/vms/${vmId}/power/${action}`);
       message.success(`VM ${action === 'on' ? 'started' : action === 'off' ? 'stopped' : 'suspended'}`);
       fetchAll();
     } catch (err: any) {
@@ -132,7 +132,7 @@ export default function Virtualization() {
 
   const handleSnapshot = async (vmId: string) => {
     try {
-      await api.post(`/api/virtualization/vms/${vmId}/snapshot?name=obs-snapshot&quiesce=true`);
+      await api.post(`/virtualization/vms/${vmId}/snapshot?name=obs-snapshot&quiesce=true`);
       message.success('Snapshot created');
     } catch (err: any) {
       message.error('Snapshot failed');
@@ -244,7 +244,7 @@ export default function Virtualization() {
                   <Space>
                     <Button size="small">Test</Button>
                     <Popconfirm title="Disconnect?" onConfirm={() => {
-                      api.delete(`/api/virtualization/hypervisors/${r.id}`);
+                      api.delete(`/virtualization/hypervisors/${r.id}`);
                       fetchAll();
                     }}>
                       <Button size="small" danger>Disconnect</Button>

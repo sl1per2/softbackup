@@ -12,7 +12,7 @@ export default function SureBackup() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [r, s] = await Promise.all([api.get('/api/surebackup/results'), api.get('/api/surebackup/summary')]);
+      const [r, s] = await Promise.all([api.get('/surebackup/results'), api.get('/surebackup/summary')]);
       setResults(r.data.results || []);
       setSummary(s.data);
     } catch {

@@ -31,7 +31,7 @@ export default function Users() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const resp = await api.get('/api/admin/users');
+      const resp = await api.get('/admin/users');
       setUsers(resp.data);
     } catch (err: any) {
       message.error(err.response?.data?.detail || 'Failed to load users');
@@ -44,7 +44,7 @@ export default function Users() {
   const handleCreate = async () => {
     const values = await form.validateFields();
     try {
-      await api.post('/api/admin/users', values);
+      await api.post('/admin/users', values);
       message.success('User created');
       setModalOpen(false);
       form.resetFields();
@@ -58,7 +58,7 @@ export default function Users() {
     const values = await form.validateFields();
     if (!editingUser) return;
     try {
-      await api.put(`/api/admin/users/${editingUser.id}`, values);
+      await api.put(`/admin/users/${editingUser.id}`, values);
       message.success('User updated');
       setModalOpen(false);
       setEditingUser(null);
@@ -71,7 +71,7 @@ export default function Users() {
 
   const handleDelete = async (userId: number) => {
     try {
-      await api.delete(`/api/admin/users/${userId}`);
+      await api.delete(`/admin/users/${userId}`);
       message.success('User deleted');
       fetchUsers();
     } catch (err: any) {
@@ -83,7 +83,7 @@ export default function Users() {
     const values = await passwordForm.validateFields();
     if (!changePasswordUser) return;
     try {
-      await api.post(`/api/admin/users/${changePasswordUser.id}/reset-password`, {
+      await api.post(`/admin/users/${changePasswordUser.id}/reset-password`, {
         new_password: values.new_password,
       });
       message.success('Password reset');
@@ -97,7 +97,7 @@ export default function Users() {
   const handleMyPassword = async () => {
     const values = await myPasswordForm.validateFields();
     try {
-      await api.post('/api/admin/change-password', {
+      await api.post('/admin/change-password', {
         old_password: values.old_password,
         new_password: values.new_password,
       });

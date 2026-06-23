@@ -42,7 +42,7 @@ export default function BulkInstallProgress({ open, hosts, onClose, onComplete }
       setJobs(prev => prev.map((j, idx) => idx === i ? { ...j, status: 'installing', progress: 50 } : j));
 
       try {
-        const endpoint = host.os_type === 'windows' ? '/api/agents/deploy/winrm' : '/api/agents/deploy/ssh';
+        const endpoint = host.os_type === 'windows' ? '/agents/deploy/winrm' : '/agents/deploy/ssh';
         const res = await api.post(endpoint, {
           host: host.host, username: host.username, password: host.password,
           os_type: host.os_type, port: host.os_type === 'windows' ? 5985 : 22,

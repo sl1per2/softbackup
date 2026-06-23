@@ -9,7 +9,7 @@ export default function VMReplication() {
 
   const fetchData = async () => {
     try {
-      const r = await api.get('/api/replication-v2');
+      const r = await api.get('/replication-v2');
       setReps(r.data.replications || []);
     } catch {
       message.error('Failed to load VM replication jobs');

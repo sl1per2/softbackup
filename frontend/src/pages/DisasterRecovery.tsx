@@ -12,7 +12,7 @@ export default function DisasterRecovery() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [p, r] = await Promise.all([api.get('/api/dr/plans'), api.get('/api/dr/runs')]);
+      const [p, r] = await Promise.all([api.get('/dr/plans'), api.get('/dr/runs')]);
       setPlans(p.data.plans || []);
       setRuns(r.data.runs || []);
     } catch {
@@ -25,7 +25,7 @@ export default function DisasterRecovery() {
 
   const handleRun = async (planId: string) => {
     try {
-      const resp = await api.post(`/api/dr/plans/${planId}/run`);
+      const resp = await api.post(`/dr/plans/${planId}/run`);
       message.success(`DR Plan started: ${resp.data.run_id}`);
       fetchData();
     } catch { message.error('Failed'); }

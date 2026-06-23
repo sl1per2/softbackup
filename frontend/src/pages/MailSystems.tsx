@@ -19,7 +19,7 @@ export default function MailSystems() {
   const fetchSystems = useCallback(async () => {
     setLoading(true);
     try {
-      const resp = await api.get('/api/mail/supported');
+      const resp = await api.get('/mail/supported');
       setSystems(resp.data.systems || []);
     } catch {
       message.error('Failed to load mail systems');
@@ -32,7 +32,7 @@ export default function MailSystems() {
   const handleConnect = async () => {
     const values = await form.validateFields();
     try {
-      await api.post('/api/mail/test', values);
+      await api.post('/mail/test', values);
       message.success('Connected!');
       setConnectOpen(false);
     } catch {

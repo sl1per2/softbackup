@@ -21,7 +21,7 @@ export default function Databases() {
   const fetchDatabases = useCallback(async () => {
     setLoading(true);
     try {
-      const resp = await api.get('/api/dbms/supported');
+      const resp = await api.get('/dbms/supported');
       setDatabases(resp.data.databases || []);
     } catch {
       message.error('Failed to load database list');
@@ -34,7 +34,7 @@ export default function Databases() {
   const handleConnect = async () => {
     const values = await form.validateFields();
     try {
-      await api.post('/api/dbms/test', values);
+      await api.post('/dbms/test', values);
       message.success('Connected!');
       setConnectOpen(false);
     } catch {

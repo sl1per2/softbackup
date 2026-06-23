@@ -15,7 +15,7 @@ export default function BackupCopy() {
   const fetchJobs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/api/backup-copy');
+      const res = await api.get('/backup-copy');
       setJobs(res.data.jobs || res.data || []);
     } catch {
       message.error('Failed to load backup copy jobs');
@@ -28,7 +28,7 @@ export default function BackupCopy() {
   const handleCreate = async () => {
     try {
       const values = await form.validateFields();
-      await api.post('/api/backup-copy', values);
+      await api.post('/backup-copy', values);
       message.success('Backup Copy job created');
       setModalOpen(false);
       form.resetFields();
@@ -42,7 +42,7 @@ export default function BackupCopy() {
 
   const handleRun = async (jobId: string) => {
     try {
-      await api.post(`/api/backup-copy/${jobId}/run`);
+      await api.post(`/backup-copy/${jobId}/run`);
       message.success('Backup Copy job started');
       fetchJobs();
     } catch {

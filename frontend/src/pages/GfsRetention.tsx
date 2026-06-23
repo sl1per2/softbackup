@@ -27,7 +27,7 @@ export default function GfsRetention() {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const resp = await api.get('/api/gfs');
+      const resp = await api.get('/gfs');
       setReports(resp.data.policies || []);
     } catch {
       message.error('Failed to load GFS retention policies');
@@ -106,7 +106,7 @@ export default function GfsRetention() {
           <Card size="small" title="Actions">
             <Space direction="vertical" style={{ width: '100%' }}>
               <Button type="primary" icon={<HistoryOutlined />} block onClick={() => {
-                api.post('/api/gfs/run-cleanup');
+                api.post('/gfs/run-cleanup');
                 message.success('GFS cleanup triggered');
               }}>Run GFS Cleanup Now</Button>
               <Button icon={<ReloadOutlined />} block onClick={fetchReports}>Refresh Report</Button>

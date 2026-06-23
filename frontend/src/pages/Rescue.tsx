@@ -13,7 +13,7 @@ export default function Rescue() {
 
   const fetchImages = async () => {
     try {
-      const resp = await api.get('/api/rescue/images');
+      const resp = await api.get('/rescue/images');
       setImages(resp.data.images || []);
     } catch {
       message.error('Failed to load rescue images');
@@ -27,7 +27,7 @@ export default function Rescue() {
     setProgress(0);
     try {
       const values = await form.validateFields();
-      await api.post('/api/rescue/create', values);
+      await api.post('/rescue/create', values);
       message.success('Rescue image created');
       fetchImages();
     } catch (err: any) {

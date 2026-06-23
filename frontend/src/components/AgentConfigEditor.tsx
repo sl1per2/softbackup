@@ -32,8 +32,8 @@ export default function AgentConfigEditor({ open, agentId, agentName, onClose }:
     setLoading(true);
     try {
       const [schemaRes, configRes] = await Promise.all([
-        api.get(`/api/config-editor/schema/${agentId}`),
-        api.get(`/api/config-editor/${agentId}`),
+        api.get(`/config-editor/schema/${agentId}`),
+        api.get(`/config-editor/${agentId}`),
       ]);
       setFields(schemaRes.data.schema || []);
       form.setFieldsValue(configRes.data);
@@ -51,7 +51,7 @@ export default function AgentConfigEditor({ open, agentId, agentName, onClose }:
     try {
       const values = await form.validateFields();
       setSaving(true);
-      await api.put(`/api/config-editor/${agentId}`, values);
+      await api.put(`/config-editor/${agentId}`, values);
       message.success('Configuration saved. Agent will apply changes within 30 seconds.');
       onClose();
     } catch {
@@ -62,7 +62,7 @@ export default function AgentConfigEditor({ open, agentId, agentName, onClose }:
 
   const handleApplyNow = async () => {
     try {
-      await api.post(`/api/agents/${agentId}/command/apply-config`);
+      await api.post(`/agents/${agentId}/command/apply-config`);
       message.success('Agent restarting to apply configuration');
     } catch {
       message.error('Failed to apply configuration');

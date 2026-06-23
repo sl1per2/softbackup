@@ -14,7 +14,7 @@ export default function DirectoryServices() {
   const fetchDirs = async () => {
     setLoading(true);
     try {
-      const resp = await api.get('/api/directory/supported');
+      const resp = await api.get('/directory/supported');
       setDirs(resp.data.services || []);
     } catch {
       message.error('Failed to load directory services');
@@ -27,7 +27,7 @@ export default function DirectoryServices() {
   const handleConnect = async () => {
     const values = await form.validateFields();
     try {
-      await api.post('/api/directory/test', values);
+      await api.post('/directory/test', values);
       message.success('Connected!');
       setConnectOpen(false);
     } catch {

@@ -15,7 +15,7 @@ export default function Replication() {
   const fetchJobs = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/api/replication');
+      const res = await api.get('/replication');
       setJobs(res.data.jobs || res.data || []);
     } catch (err: any) {
       message.error('Failed to load replication jobs');
@@ -28,7 +28,7 @@ export default function Replication() {
   const handleStart = async () => {
     try {
       const values = await form.validateFields();
-      await api.post('/api/replication/start', values);
+      await api.post('/replication/start', values);
       message.success('Replication started');
       setModalOpen(false);
       form.resetFields();
@@ -42,7 +42,7 @@ export default function Replication() {
 
   const handlePause = async (jobId: string) => {
     try {
-      await api.post(`/api/replication/${jobId}/pause`);
+      await api.post(`/replication/${jobId}/pause`);
       message.success('Replication paused');
       fetchJobs();
     } catch {
@@ -52,7 +52,7 @@ export default function Replication() {
 
   const handleStop = async (jobId: string) => {
     try {
-      await api.post(`/api/replication/${jobId}/stop`);
+      await api.post(`/replication/${jobId}/stop`);
       message.success('Replication stopped');
       fetchJobs();
     } catch {

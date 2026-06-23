@@ -11,7 +11,7 @@ export default function OsBackup() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const resp = await api.get('/api/os-backup/supported-filesystems');
+      const resp = await api.get('/os-backup/supported-filesystems');
       setFsData(resp.data);
     } catch {
       message.error('Failed to load filesystem data');

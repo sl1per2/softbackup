@@ -21,7 +21,7 @@ export default function Agents() {
       const params: any = {};
       if (search) params.search = search;
       if (statusFilter) params.status = statusFilter;
-      const res = await api.get('/api/agents', { params });
+      const res = await api.get('/agents', { params });
       setAgents(res.data);
     } catch (err: any) {
       message.error('Failed to load agents');

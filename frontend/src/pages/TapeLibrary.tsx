@@ -11,7 +11,7 @@ export default function TapeLibrary() {
   const fetchLibrary = async () => {
     setLoading(true);
     try {
-      const resp = await api.get('/api/tape-library/inventory');
+      const resp = await api.get('/tape-library/inventory');
       setLibrary(resp.data.inventory || []);
     } catch {
       message.error('Failed to load tape library inventory');
@@ -23,7 +23,7 @@ export default function TapeLibrary() {
 
   const handleMount = async (barcode: string) => {
     try {
-      await api.post(`/api/tape/mount?barcode=${barcode}&drive_index=0`);
+      await api.post(`/tape/mount?barcode=${barcode}&drive_index=0`);
       message.success(`Tape ${barcode} mounted`);
       fetchLibrary();
     } catch {
@@ -33,7 +33,7 @@ export default function TapeLibrary() {
 
   const handleInventory = async () => {
     try {
-      await api.post('/api/tape/inventory');
+      await api.post('/tape/inventory');
       message.success('Inventory complete');
       fetchLibrary();
     } catch {

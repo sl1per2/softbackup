@@ -47,7 +47,7 @@ export default function InstallAgentPopup({ open, onClose, onComplete }: Props) 
       setStep(3);
 
       const osType = values.os_type === 'windows' ? 'winrm' : 'ssh';
-      const endpoint = `/api/agents/deploy/${osType}`;
+      const endpoint = `/agents/deploy/${osType}`;
       const payload = osType === 'ssh' ? {
         host: values.host, port: values.ssh_port || 22,
         username: values.username, password: values.password,

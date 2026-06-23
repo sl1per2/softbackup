@@ -27,7 +27,7 @@ export default function AgentLogViewer({ open, agentId, agentName, onClose }: Pr
       const params: any = { tail: 1000 };
       if (level) params.level = level;
       if (search) params.search = search;
-      const res = await api.get(`/api/log-viewer/${agentId}`, { params });
+      const res = await api.get(`/log-viewer/${agentId}`, { params });
       setLogs(res.data.logs || []);
     } catch {
       message.error('Failed to load logs');

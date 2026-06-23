@@ -9,7 +9,7 @@ export function useStorages() {
   const fetch = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/api/storages');
+      const res = await api.get('/storages');
       setStorages(res.data);
     } catch (err: any) {
       message.error('Failed to load storages');
@@ -29,7 +29,7 @@ export function usePolicies() {
   const fetch = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/api/policies');
+      const res = await api.get('/policies');
       setPolicies(res.data);
     } catch (err: any) {
       message.error('Failed to load policies');

@@ -23,7 +23,7 @@ export default function QuickBackupPopup({ open, agentId, agentName, onClose }: 
     try {
       const values = await form.validateFields();
       setLoading(true);
-      await api.post(`/api/agents/${agentId}/command/start-backup`, {
+      await api.post(`/agents/${agentId}/command/start-backup`, {
         backup_type: values.backup_type,
         source_paths: values.source_paths?.split(',').map((s: string) => s.trim()).filter(Boolean),
         storage_id: values.storage_id,
