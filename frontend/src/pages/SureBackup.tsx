@@ -20,7 +20,6 @@ export default function SureBackup() {
     }
     setLoading(false);
   }, []);
-  };
 
   useEffect(() => { fetchData(); }, []);
 

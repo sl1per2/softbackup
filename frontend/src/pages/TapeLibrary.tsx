@@ -12,7 +12,7 @@ export default function TapeLibrary() {
     setLoading(true);
     try {
       const resp = await api.get('/api/tape-library/inventory');
-      setInventory(resp.data.inventory || []);
+      setLibrary(resp.data.inventory || []);
     } catch {
       message.error('Failed to load tape library inventory');
     }

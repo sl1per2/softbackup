@@ -20,7 +20,6 @@ export default function DisasterRecovery() {
     }
     setLoading(false);
   }, []);
-  };
 
   useEffect(() => { fetchData(); }, []);
 

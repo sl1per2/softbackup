@@ -150,8 +150,7 @@ export default function InstallAgentPopup({ open, onClose, onComplete }: Props) 
             style={{ marginBottom: 16 }}
           />
           {steps.map((s, i) => (
-            <Card key={i} size="small" style={{ marginBottom: 8 }}
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <Card key={i} size="small" style={{ marginBottom: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <Space>
                 {s.status === 'finish' && <CheckCircleOutlined style={{ color: '#52c41a' }} />}
                 {s.status === 'process' && <LoadingOutlined style={{ color: '#1890ff' }} />}

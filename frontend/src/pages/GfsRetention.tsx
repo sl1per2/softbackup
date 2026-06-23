@@ -28,7 +28,7 @@ export default function GfsRetention() {
     setLoading(true);
     try {
       const resp = await api.get('/api/gfs');
-      setPolicies(resp.data.policies || []);
+      setReports(resp.data.policies || []);
     } catch {
       message.error('Failed to load GFS retention policies');
     }
